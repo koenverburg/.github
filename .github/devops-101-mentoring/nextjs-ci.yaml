@@ -35,3 +35,30 @@ jobs:
           path: ./.next
           name: nextjs-build-output
           retention-days: 2
+
+  deploy:
+    needs: [build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          path: ./.next
+          name: nextjs-build-output
+
+      - name: Download nextjs output
+        uses: actions/download-artifact@v3
+        with:
+          name: nextjs-build-output
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./.next
+          github_token: ${{ secrets.GITHUB_TOKEN }}
