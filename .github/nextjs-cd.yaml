@@ -1,4 +1,4 @@
-name: CI
+name: CD
 
 on:
   push:
@@ -15,23 +15,19 @@ jobs:
         with:
           access_token: ${{ github.token }}
 
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Installing node 18
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - run: npm install
-
-      - run: npm run build
-
-      - run: npm run export
-
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v3
         with:
           path: ./.next
           name: nextjs-build-output
-          retention-days: 2
+
+      - name: Download nextjs output
+        uses: actions/download-artifact@v3
+        with:
+          name: nextjs-build-output
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./.next
+          github_token: ${{ secrets.GITHUB_TOKEN }}
