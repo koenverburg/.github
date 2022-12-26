@@ -57,7 +57,7 @@ jobs:
         with:
           push: true
           context: ./
-          platforms: linux/arm64, linux/amd64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           file: ${{ inputs.dockerfile_path }}
           tags: ${{ steps.meta.outputs.tags }}
           builder: ${{ steps.buildx.outputs.name }}
