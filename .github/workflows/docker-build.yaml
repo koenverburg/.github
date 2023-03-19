@@ -9,6 +9,9 @@ on:
       tags:
         type: string
         required: true
+      platforms:
+        type: string
+        required: true
       registry:
         type: string
         required: true
@@ -57,7 +60,8 @@ jobs:
         with:
           push: true
           context: ./
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          # platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: ${{ inputs.platforms }}
           file: ${{ inputs.dockerfile_path }}
           tags: ${{ steps.meta.outputs.tags }}
           builder: ${{ steps.buildx.outputs.name }}
