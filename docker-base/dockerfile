@@ -1,0 +1,4 @@
+FROM node:20-alpine as core
+RUN apk --no-cache add curl
+RUN corepack enable pnpm
+RUN curl -sSL https://bina.egoist.sh/egoist/dum | sh

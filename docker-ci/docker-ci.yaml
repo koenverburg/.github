@@ -1,0 +1,69 @@
+name: docker-build
+
+on:
+  workflow_call:
+    secrets:
+      docker_token:
+       required: true
+    inputs:
+      tags:
+        type: string
+        required: true
+      platforms:
+        type: string
+        required: true
+      registry:
+        type: string
+        required: true
+      image_name:
+        type: string
+        required: true
+      dockerfile_path:
+        type: string
+        required: true
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ inputs.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.docker_token }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ inputs.registry }}/${{ inputs.image_name }}
+          tags: ${{ inputs.tags }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: ./
+          # platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: ${{ inputs.platforms }}
+          file: ${{ inputs.dockerfile_path }}
+          tags: ${{ steps.meta.outputs.tags }}
+          builder: ${{ steps.buildx.outputs.name }}
+          # cache-from: type=registry,ref=${{ github.actor }}/${{ env.IMAGE_NAME }}:buildcache
+          # cache-to: type=registry,ref=${{ github.actor }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
