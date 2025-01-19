@@ -21,6 +21,9 @@ on:
       dockerfile_path:
         type: string
         required: true
+      context:
+        type: string
+        required: true
 
 jobs:
   docker-build:
@@ -28,7 +31,7 @@ jobs:
 
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.9.1
+        uses: styfle/cancel-workflow-action@0.21.1
         with:
           access_token: ${{ github.token }}
 
@@ -59,7 +62,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          context: ./
+          context: ${{ inputs.context }}
           # platforms: linux/amd64,linux/arm64,linux/arm/v7
           platforms: ${{ inputs.platforms }}
           file: ${{ inputs.dockerfile_path }}
